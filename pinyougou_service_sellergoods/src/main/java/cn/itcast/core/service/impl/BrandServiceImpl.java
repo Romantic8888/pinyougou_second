@@ -22,11 +22,22 @@ public class BrandServiceImpl  implements BrandService {
     @Autowired
     private BrandDao brandDao;
 
+    /**
+     *
+     * 查询所有
+     * @return
+     */
     @Override
     public List<Brand> findAll() {
         return brandDao.selectByExample(null);
     }
 
+    /**
+     * 分页
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @Override
     public PageResult findPage(int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
@@ -34,22 +45,39 @@ public class BrandServiceImpl  implements BrandService {
         return new PageResult(page.getTotal(), page.getResult());
     }
 
+    /**
+     * 添加
+     * @param brand
+     */
     @Override
     public void add(Brand brand) {
         brandDao.insertSelective(brand);
     }
 
+    /**
+     *修改
+     * @param brand
+     */
     @Override
     public void update(Brand brand) {
         brandDao.updateByPrimaryKeySelective(brand);
     }
 
+    /**
+     * 根据id查询一个品牌
+     * @param id
+     * @return
+     */
     @Override
     public Brand findOne(Long id) {
         Brand brand = brandDao.selectByPrimaryKey(id);
         return brand;
     }
 
+    /**
+     *批量删除
+     * @param ids
+     */
     @Override
     public void delete(Long[] ids) {
         for (Long id : ids) {
@@ -57,6 +85,13 @@ public class BrandServiceImpl  implements BrandService {
         }
     }
 
+    /**
+     * 条件查询
+     * @param pageNum
+     * @param pageSize
+     * @param brand
+     * @return
+     */
     @Override
     public PageResult search(int pageNum, int pageSize, Brand brand) {
         //封装查询条件
