@@ -1,1 +1,2 @@
-var app = angular.module('pinyougou', ['pagination']);//分页的公共js
+// 定义模块:
+var app = angular.module("pinyougou",['pagination']);
