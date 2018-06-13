@@ -52,6 +52,7 @@ app.controller('brandController', function ($scope,$controller,brandService) {
         brandService.delete($scope.selectIds).success(
             function (response) {
                 if (response.flag) {
+                    $scope.selectIds = [];
                     //重新加载
                     $scope.reloadList();
                 } else {
