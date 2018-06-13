@@ -18,7 +18,7 @@ public interface BrandService {
      * @param pageSize
      * @return
      */
-    PageResult findPage(int pageNum,int pageSize);
+    PageResult findPage(Integer pageNum,Integer pageSize);
 
     /**
      * 新建品牌
@@ -52,5 +52,5 @@ public interface BrandService {
      * @param brand
      * @return
      */
-    PageResult search(int pageNum,int pageSize,Brand brand);
+    PageResult search(Integer pageNum,Integer pageSize,Brand brand);
 }

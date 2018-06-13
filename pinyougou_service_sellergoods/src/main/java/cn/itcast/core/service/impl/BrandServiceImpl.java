@@ -39,7 +39,7 @@ public class BrandServiceImpl  implements BrandService {
      * @return
      */
     @Override
-    public PageResult findPage(int pageNum, int pageSize) {
+    public PageResult findPage(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         Page<Brand> page = (Page) brandDao.selectByExample(null);
         return new PageResult(page.getTotal(), page.getResult());
@@ -93,7 +93,7 @@ public class BrandServiceImpl  implements BrandService {
      * @return
      */
     @Override
-    public PageResult search(int pageNum, int pageSize, Brand brand) {
+    public PageResult search(Integer pageNum, Integer pageSize, Brand brand) {
         //封装查询条件
         BrandQuery brandQuery = new BrandQuery();
         BrandQuery.Criteria criteria = brandQuery.createCriteria();

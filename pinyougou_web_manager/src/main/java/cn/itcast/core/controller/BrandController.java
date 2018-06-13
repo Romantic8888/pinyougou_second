@@ -5,9 +5,7 @@ import cn.itcast.core.service.BrandService;
 import com.alibaba.dubbo.config.annotation.Reference;
 import entity.PageResult;
 import entity.Result;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -104,7 +102,7 @@ public class BrandController {
      * @return
      */
     @RequestMapping("/search")
-    public PageResult search(int page,int rows,@RequestBody(required = false) Brand brand){
+    public PageResult search(@RequestParam("pageNum") Integer page, @RequestParam("pageSize") Integer rows, @RequestBody(required = false) Brand brand){
        return brandService.search(page,rows,brand);
     }
 }
