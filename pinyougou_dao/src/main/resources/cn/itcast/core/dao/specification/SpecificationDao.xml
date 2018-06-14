@@ -105,7 +105,10 @@
     insert into tb_specification (id, spec_name)
     values (#{id,jdbcType=BIGINT}, #{specName,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="cn.itcast.core.pojo.specification.Specification" >
+  <insert id="insertSelective" parameterType="cn.itcast.core.pojo.specification.Specification" useGeneratedKeys="true" keyProperty="id" >
+   <!-- <selectKey keyProperty="id" resultType="Long" order="AFTER">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>-->
     insert into tb_specification
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

@@ -1,6 +1,7 @@
 package cn.itcast.core.service;
 
 import cn.itcast.core.pojo.specification.Specification;
+import cn.itcast.core.pojogroup.SpecificationVo;
 import entity.PageResult;
 
 public interface SpecificationService {
@@ -12,4 +13,29 @@ public interface SpecificationService {
      * @return
      */
     PageResult search(Integer pageNum, Integer pageSize, Specification specification);
+
+    /**
+     * 新增规格
+     * @param specificationVo
+     */
+    void add(SpecificationVo specificationVo);
+
+    /**
+     *根据id查询一个实体
+     * @param id
+     * @return
+     */
+    SpecificationVo findOne(Long id);
+
+    /**
+     * 修改规格表及规格属性表
+     * @param vo
+     */
+    void update(SpecificationVo vo);
+
+    /**
+     * 批量删除
+     * @param ids
+     */
+    void delete(Long[] ids);
 }
