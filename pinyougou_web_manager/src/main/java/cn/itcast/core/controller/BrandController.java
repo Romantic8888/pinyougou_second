@@ -8,6 +8,7 @@ import entity.Result;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 品牌管理
@@ -104,5 +105,9 @@ public class BrandController {
     @RequestMapping("/search")
     public PageResult search(@RequestParam("pageNum") Integer page, @RequestParam("pageSize") Integer rows, @RequestBody(required = false) Brand brand){
        return brandService.search(page,rows,brand);
+    }
+    @RequestMapping("/selectOptionList")
+    public List<Map> selectOptionList(){
+        return brandService.selectOptionList();
     }
 }

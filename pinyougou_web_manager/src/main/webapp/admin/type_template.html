@@ -52,7 +52,7 @@
                             <div class="pull-left">
                                 <div class="form-group form-inline">
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-default" title="新建"  data-toggle="modal" data-target="#editModal" ><i class="fa fa-file-o"></i> 新建</button>
+                                        <button type="button" class="btn btn-default" title="新建"  data-toggle="modal" data-target="#editModal" ng-click="entity={customAttributeItems:[]}" ><i class="fa fa-file-o"></i> 新建</button>
                                         <button type="button" class="btn btn-default" ng-click="dele()" title="删除"><i class="fa fa-trash-o"></i> 删除</button>
                                        
                                         <button type="button" class="btn btn-default" title="刷新" onclick="window.location.reload();"><i class="fa fa-refresh"></i> 刷新</button>
@@ -102,16 +102,8 @@
 							 
                         </div>
                         <!-- 数据表格 /-->
-                        
-                        
-                        
-                        
                      </div>
                     <!-- /.box-body -->
-                    
-	           
-					    
-                                
 <!-- 编辑窗口 -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" >
@@ -168,12 +160,9 @@
 								</tr>
 							</tbody>
 						</table>	
-           
 		      		</td>
 		      	</tr>	
-		      	      
-			 </table>				
-			
+			 </table>
 		</div>
 		<div class="modal-footer">						
 			<button class="btn btn-success" data-dismiss="modal" aria-hidden="true" ng-click="save()">保存</button>

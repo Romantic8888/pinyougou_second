@@ -4,6 +4,7 @@ import cn.itcast.core.pojo.good.Brand;
 import entity.PageResult;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BrandService {
     /**
@@ -53,4 +54,6 @@ public interface BrandService {
      * @return
      */
     PageResult search(Integer pageNum,Integer pageSize,Brand brand);
+
+    List<Map> selectOptionList();
 }

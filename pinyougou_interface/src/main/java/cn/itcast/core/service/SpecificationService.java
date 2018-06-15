@@ -4,6 +4,9 @@ import cn.itcast.core.pojo.specification.Specification;
 import cn.itcast.core.pojogroup.SpecificationVo;
 import entity.PageResult;
 
+import java.util.List;
+import java.util.Map;
+
 public interface SpecificationService {
     /**
      * 分页查询(带条件)
@@ -38,4 +41,6 @@ public interface SpecificationService {
      * @param ids
      */
     void delete(Long[] ids);
+
+    List<Map> selectOptionList();
 }

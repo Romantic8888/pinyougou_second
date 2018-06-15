@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 品牌管理
@@ -112,6 +113,11 @@ public class BrandServiceImpl  implements BrandService {
         //查询
         Page<Brand> page = (Page<Brand>) brandDao.selectByExample(brandQuery);
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public List<Map> selectOptionList() {
+        return brandDao.selectOptionList();
     }
 
 }
