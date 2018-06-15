@@ -5,5 +5,4 @@ app.controller("indexController",function($scope,loginService){
 			$scope.loginName = response.username;
 		});
 	}
-	
 });
