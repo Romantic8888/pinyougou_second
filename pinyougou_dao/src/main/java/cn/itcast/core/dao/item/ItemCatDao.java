@@ -2,8 +2,10 @@ package cn.itcast.core.dao.item;
 
 import cn.itcast.core.pojo.item.ItemCat;
 import cn.itcast.core.pojo.item.ItemCatQuery;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 public interface ItemCatDao {
     int countByExample(ItemCatQuery example);
@@ -27,4 +29,6 @@ public interface ItemCatDao {
     int updateByPrimaryKeySelective(ItemCat record);
 
     int updateByPrimaryKey(ItemCat record);
+
+    List<Map> selectTypeTemplateList();
 }

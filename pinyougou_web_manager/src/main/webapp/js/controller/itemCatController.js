@@ -1,5 +1,5 @@
  //控制层 
-app.controller('itemCatController' ,function($scope,$controller   ,itemCatService){	
+app.controller('itemCatController' ,function($scope,$controller,itemCatService){
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -37,13 +37,15 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 		if($scope.entity.id!=null){//如果有ID
 			serviceObject=itemCatService.update( $scope.entity ); //修改  
 		}else{
+            $scope.entity.parentId=$scope.parentId;//赋予上级ID
 			serviceObject=itemCatService.add( $scope.entity  );//增加 
 		}				
 		serviceObject.success(
 			function(response){
 				if(response.flag){
-					//重新查询 
-		        	$scope.reloadList();//重新加载
+					//重新查询
+                    $scope.findByParentId($scope.parentId);//重新加载
+		        	//$scope.reloadList();//重新加载
 				}else{
 					alert(response.message);
 				}
@@ -58,7 +60,9 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 		itemCatService.dele( $scope.selectIds ).success(
 			function(response){
 				if(response.flag){
-					$scope.reloadList();//刷新列表
+                    //重新查询
+                    $scope.findByParentId($scope.parentId);//重新加载
+					//$scope.reloadList();//刷新列表
 					$scope.selectIds = [];
 				}						
 			}		
@@ -76,38 +80,48 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 			}			
 		);
 	}
-	
+
+    $scope.parentId=0;//上级ID
 	// 根据父ID查询分类
 	$scope.findByParentId =function(parentId){
+		$scope.parentId=parentId;//记住上级ID
 		itemCatService.findByParentId(parentId).success(function(response){
 			$scope.list=response;
 		});
 	}
-	
+
 	// 定义一个变量记录当前是第几级分类
 	$scope.grade = 1;
-	
+
 	$scope.setGrade = function(value){
 		$scope.grade = value;
 	}
-	
+
 	$scope.selectList = function(p_entity){
-		
-		if($scope.grade == 1){
+
+		if($scope.grade == 1){//如果为1级
 			$scope.entity_1 = null;
 			$scope.entity_2 = null;
 		}
-		if($scope.grade == 2){
+		if($scope.grade == 2){//如果为2级
 			$scope.entity_1 = p_entity;
 			$scope.entity_2 = null;
 		}
-		if($scope.grade == 3){
+		if($scope.grade == 3){//如果为三级
 			$scope.entity_2 = p_entity;
 		}
-		
-		$scope.findByParentId(p_entity.id);
+
+		$scope.findByParentId(p_entity.id);//查询此级下级列表
 	}
-	
+
+	$scope.typeTemplateList={data:[]};
+    // 查询关联的类型模版信息:
+    $scope.findTypeTemplateList= function(){
+        itemCatService.selectTypeTemplateList().success(function(response){
+            $scope.typeTemplateList = {data:response};
+        });
+    }
+
 	
 	
 	
