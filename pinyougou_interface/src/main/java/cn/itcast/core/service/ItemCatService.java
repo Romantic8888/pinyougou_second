@@ -25,4 +25,5 @@ public interface ItemCatService {
     void delete(Long[] ids);
 
     PageResult search(ItemCat itemCat, Integer page, Integer rows);
+    List<ItemCat> findAll();
 }

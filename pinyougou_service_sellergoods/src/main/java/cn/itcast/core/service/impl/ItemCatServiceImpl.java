@@ -61,4 +61,8 @@ public class ItemCatServiceImpl implements ItemCatService {
         Page<ItemCat> page= (Page<ItemCat>) itemCatDao.selectByExample(null);
         return new PageResult(page.getTotal(),page.getResult());
     }
+    @Override
+    public List<ItemCat> findAll(){
+        return itemCatDao.selectByExample(null);
+    }
 }

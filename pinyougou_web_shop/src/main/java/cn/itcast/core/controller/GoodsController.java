@@ -1,8 +1,10 @@
 package cn.itcast.core.controller;
 
+import cn.itcast.core.pojo.good.Goods;
 import cn.itcast.core.pojogroup.GoodsVo;
 import cn.itcast.core.service.GoodsService;
 import com.alibaba.dubbo.config.annotation.Reference;
+import entity.PageResult;
 import entity.Result;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,5 +28,10 @@ public class GoodsController {
             e.printStackTrace();
             return new Result(false, "增加失败");
         }
+    }
+
+    @RequestMapping("/search")
+    public PageResult search(Integer page, Integer rows,@RequestBody Goods goods){
+        return goodsService.search(page,rows,goods);
     }
 }

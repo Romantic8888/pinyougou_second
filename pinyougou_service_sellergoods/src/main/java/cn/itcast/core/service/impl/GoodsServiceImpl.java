@@ -1,15 +1,26 @@
 package cn.itcast.core.service.impl;
 
+import cn.itcast.core.dao.good.BrandDao;
 import cn.itcast.core.dao.good.GoodsDao;
 import cn.itcast.core.dao.good.GoodsDescDao;
+import cn.itcast.core.dao.item.ItemCatDao;
+import cn.itcast.core.dao.item.ItemDao;
+import cn.itcast.core.dao.seller.SellerDao;
+import cn.itcast.core.pojo.good.Goods;
+import cn.itcast.core.pojo.good.GoodsQuery;
 import cn.itcast.core.pojo.item.Item;
 import cn.itcast.core.pojogroup.GoodsVo;
 import cn.itcast.core.service.GoodsService;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +32,14 @@ public class GoodsServiceImpl implements GoodsService {
     private GoodsDao goodsDao;
     @Autowired
     private GoodsDescDao goodsDescDao;
+    @Autowired
+    private ItemDao itemDao;
+    @Autowired
+    private ItemCatDao itemCatDao;
+    @Autowired
+    private SellerDao sellerDao;
+    @Autowired
+    private BrandDao brandDao;
 
     @Override
     public void add(GoodsVo vo) {
@@ -44,11 +63,66 @@ public class GoodsServiceImpl implements GoodsService {
                     title+=" "+entry.getValue();
                 }
                 item.setTitle(title);
-
+                //设置库存对象的属性
+                setAttribute(item,vo);
+                itemDao.insertSelective(item);
             }
         }else{
-
-
+            //未启用  默认一个规格  不要为Null
+            //标题
+            Item item = new Item();
+            item.setTitle(vo.getGoods().getGoodsName());
+            //设置库存对象的属性
+            setAttribute(item,vo);
+            //价格
+            item.setPrice(new BigDecimal(0));
+            item.setNum(9999);
+            item.setStatus("1");
+            item.setIsDefault("1");
+            item.setSpec("{}");
+            itemDao.insertSelective(item);
         }
+    }
+    //设置库存对象的属性
+    public void setAttribute(Item item,GoodsVo vo){
+        List<Map> list = JSON.parseArray(vo.getGoodsDesc().getItemImages(), Map.class);
+        if(null != list && list.size() >0){
+            //图片
+            item.setImage((String)list.get(0).get("url"));
+        }
+        //商品分类 第三级分类的ID
+        item.setCategoryid(vo.getGoods().getCategory3Id());
+        //商品分类第三级分类的名称
+        item.setCategory(itemCatDao.selectByPrimaryKey(vo.getGoods().getCategory3Id()).getName());
+        //添加时间
+        item.setCreateTime(new Date());
+        //更新时间
+        item.setUpdateTime(new Date());
+        //外键
+        item.setGoodsId(vo.getGoods().getId());
+        //商家ID
+        item.setSellerId(vo.getGoods().getSellerId());
+        //商家名称
+        item.setSeller(sellerDao.selectByPrimaryKey(vo.getGoods().getSellerId()).getNickName());
+        //品牌名称
+        item.setBrand(brandDao.selectByPrimaryKey(vo.getGoods().getBrandId()).getName());
+    }
+    //查询商品结果集
+    public PageResult search(Integer page, Integer rows, Goods goods){
+        PageHelper.startPage(page, rows);
+        PageHelper.orderBy("id desc");
+        //判断条件  由同学完成
+        GoodsQuery query = new GoodsQuery();
+        GoodsQuery.Criteria criteria = query.createCriteria();
+        if (goods!=null) {
+            if (null != goods.getGoodsName()&& !"".equals(goods.getGoodsName().trim())) {
+                criteria.andGoodsNameLike("%" +goods.getGoodsName().trim() + "%");
+            }
+            if (null!=goods.getAuditStatus()&&!"".equals(goods.getAuditStatus())){
+                criteria.andAuditStatusEqualTo(goods.getAuditStatus());
+            }
+        }
+        Page<Goods> p = (Page<Goods>) goodsDao.selectByExample(query);
+        return new PageResult(p.getTotal(), p.getResult());
     }
 }
