@@ -32,6 +32,8 @@ public class GoodsController {
 
     @RequestMapping("/search")
     public PageResult search(Integer page, Integer rows,@RequestBody Goods goods){
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        goods.setSellerId(name);
         return goodsService.search(page,rows,goods);
     }
 }

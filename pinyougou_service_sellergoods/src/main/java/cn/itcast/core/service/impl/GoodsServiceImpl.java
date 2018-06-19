@@ -115,6 +115,9 @@ public class GoodsServiceImpl implements GoodsService {
         GoodsQuery query = new GoodsQuery();
         GoodsQuery.Criteria criteria = query.createCriteria();
         if (goods!=null) {
+            if (null!=goods.getSellerId()&&!"".equals(goods.getSellerId().trim())){
+                criteria.andSellerIdEqualTo(goods.getSellerId());
+            }
             if (null != goods.getGoodsName()&& !"".equals(goods.getGoodsName().trim())) {
                 criteria.andGoodsNameLike("%" +goods.getGoodsName().trim() + "%");
             }
