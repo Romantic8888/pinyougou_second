@@ -36,4 +36,31 @@ public class GoodsController {
         goods.setSellerId(name);
         return goodsService.search(page,rows,goods);
     }
+
+    //通过一个Id查询一个goodsvo
+    @RequestMapping("/findOne")
+    public GoodsVo findOne(Long id){
+        return  goodsService.findOne(id);
+    }
+    @RequestMapping("/update")
+    public Result update(@RequestBody GoodsVo vo){
+        try {
+            goodsService.update(vo);
+            return new Result(true, "修改成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "修改失败");
+        }
+    }
+    @RequestMapping("/delete")
+    public Result delete(Long[] ids){
+        try {
+            goodsService.delete(ids);
+            return new Result(true, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "删除失败");
+        }
+
+    }
 }

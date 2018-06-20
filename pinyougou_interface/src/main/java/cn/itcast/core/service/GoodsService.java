@@ -10,4 +10,10 @@ public interface GoodsService {
      */
     void add(GoodsVo goods);
     PageResult search(Integer page, Integer rows, Goods goods);
+
+    GoodsVo findOne(Long id);
+
+    void update(GoodsVo vo);
+
+    void delete(Long[] ids);
 }
