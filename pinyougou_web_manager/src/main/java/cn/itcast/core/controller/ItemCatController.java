@@ -80,4 +80,10 @@ public class ItemCatController {
     public PageResult search(@RequestBody ItemCat itemCat, Integer page, Integer rows) {
         return itemCatService.search(itemCat, page, rows);
     }
+
+    //通过商品分类Id 查询商品分类对象(对象里面有一模板ID)
+    @RequestMapping("/findAll")
+    public List<ItemCat> findAll(){
+        return itemCatService.findAll();
+    }
 }
