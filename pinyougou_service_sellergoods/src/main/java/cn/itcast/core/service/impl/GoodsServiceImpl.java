@@ -147,6 +147,16 @@ public class GoodsServiceImpl implements GoodsService {
         }
     }
 
+    @Override
+    public void updateStatus(Long[] ids, String status) {
+        Goods goods = new Goods();
+        goods.setAuditStatus(status);
+        for (Long id:ids) {
+            goods.setId(id);
+            goodsDao.updateByPrimaryKeySelective(goods);
+        }
+    }
+
     private void checkIsEnableSpec(GoodsVo vo) {
         //判断是否启用规格
         if ("1".equals(vo.getGoods().getIsEnableSpec())){

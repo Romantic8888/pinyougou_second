@@ -32,7 +32,7 @@ public class GoodsController {
     @RequestMapping("/updateStatus")
     public Result updateStatus(Long[] ids,String status){
         try {
-            goodsService.delete(ids);
+            goodsService.updateStatus(ids,status);
             return new Result(true, "审核成功");
         } catch (Exception e) {
             e.printStackTrace();

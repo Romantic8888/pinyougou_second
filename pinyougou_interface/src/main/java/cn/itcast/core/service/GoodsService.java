@@ -16,4 +16,6 @@ public interface GoodsService {
     void update(GoodsVo vo);
 
     void delete(Long[] ids);
+
+    void updateStatus(Long[] ids, String status);
 }

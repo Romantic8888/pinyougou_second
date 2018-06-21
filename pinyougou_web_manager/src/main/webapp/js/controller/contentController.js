@@ -85,7 +85,9 @@ app.controller('contentController' ,function($scope,$controller ,uploadService,c
 			}else{
 				alert(response.message);
 			}
-		});
+		}).error(function () {
+            alert("上传出错！");
+        });
 	}
 	
 	// 查询所有广告分类
