@@ -18,4 +18,10 @@ public interface ContentService {
 
     void delAll(Long[] ids);
 
+    /**
+     * 根据广告类型ID查询列表
+     * @param key
+     * @return
+     */
+   List<Content> findByCategoryId(Long categoryId);
 }

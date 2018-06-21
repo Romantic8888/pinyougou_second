@@ -2,6 +2,7 @@ package cn.itcast.core.service.impl;
 
 import cn.itcast.core.dao.ad.ContentDao;
 import cn.itcast.core.pojo.ad.Content;
+import cn.itcast.core.pojo.ad.ContentQuery;
 import cn.itcast.core.service.ContentService;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
@@ -53,6 +54,15 @@ public class ContentServiceImpl implements ContentService {
                 contentDao.deleteByPrimaryKey(id);
             }
         }
+    }
+
+    @Override
+    public List<Content> findByCategoryId(Long categoryId) {
+        ContentQuery query = new ContentQuery();
+        query.createCriteria().andCategoryIdEqualTo(categoryId)
+                .andStatusEqualTo("1");
+        query.setOrderByClause("sort_order desc");
+        return contentDao.selectByExample(query);
     }
 
 }
