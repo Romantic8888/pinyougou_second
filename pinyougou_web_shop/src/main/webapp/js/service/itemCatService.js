@@ -33,7 +33,4 @@ app.service('itemCatService',function($http){
 	this.findByParentId = function(parentId){
 		return $http.get("../itemCat/findByParentId.do?parentId="+parentId);
 	}
-	this.selectTypeTemplateList=function () {
-		return $http.get("../itemCat/selectTypeTemplateList.do");
-    }
 });
