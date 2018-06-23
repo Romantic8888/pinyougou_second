@@ -9,6 +9,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,13 +20,20 @@ import java.util.Map;
 public class ItemCatServiceImpl implements ItemCatService {
     @Autowired
     private ItemCatDao itemCatDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public List<ItemCat> findByParentId(Long parentId) {
         ItemCatQuery query = new ItemCatQuery();
         ItemCatQuery.Criteria criteria = query.createCriteria();
         criteria.andParentIdEqualTo(parentId);
+        //每次执行查询的时候，一次性读取缓存进行存储 (因为每次增删改都要执行此方法)
+        List<ItemCat> itemCatList = findAll();
+        for (ItemCat itemCat :itemCatList) {
+            redisTemplate.boundHashOps("itemCat").put(itemCat.getName(),itemCat.getTypeId());
+        }
+        System.out.println("更新缓存:商品分类表");
         return itemCatDao.selectByExample(query);
-
     }
 
     @Override

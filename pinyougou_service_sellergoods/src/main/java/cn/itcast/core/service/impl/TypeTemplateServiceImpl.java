@@ -12,6 +12,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,12 +28,15 @@ public class TypeTemplateServiceImpl implements TypeTemplateService {
     private TypeTemplateDao typeTemplateDao;
     @Autowired
     private SpecificationOptionDao specificationOptionDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //查询
     @Override
     public PageResult search(TypeTemplate typeTemplate, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         Page<TypeTemplate> page = (Page<TypeTemplate>) typeTemplateDao.selectByExample(null);
+        saveToRedis();//存入数据到缓存
         return new PageResult(page.getTotal(), page.getResult());
     }
 
@@ -62,15 +66,38 @@ public class TypeTemplateServiceImpl implements TypeTemplateService {
     public List<Map> findBySpecList(Long id) {
         //查询模板
         TypeTemplate typeTemplate = typeTemplateDao.selectByPrimaryKey(id);
-       List<Map> mapList= JSON.parseArray(typeTemplate.getSpecIds(), Map.class);
-        for (Map map:mapList) {
+        //规格属性  [{"id":27,"text":"网络"},{"id":32,"text":"机身内存"}]
+        List<Map> mapList = JSON.parseArray(typeTemplate.getSpecIds(), Map.class);
+        for (Map map : mapList) {
             //查询规格选项列表
             SpecificationOptionQuery query = new SpecificationOptionQuery();
             SpecificationOptionQuery.Criteria criteria = query.createCriteria();
-            criteria.andSpecIdEqualTo(new Long((Integer)map.get("id")));
+            criteria.andSpecIdEqualTo(new Long((Integer) map.get("id")));
             List<SpecificationOption> specificationOptions = specificationOptionDao.selectByExample(query);
-            map.put("options",specificationOptions);
+            map.put("options", specificationOptions);
         }
         return mapList;
+    }
+
+    /**
+     * 将数据存入缓存
+     */
+    private void saveToRedis() {
+        //获取模板数据
+        List<TypeTemplate> typeTemplateList = findAll();
+        //循环模板
+        for (TypeTemplate typeTemplate : typeTemplateList) {
+            //存储品牌列表
+            List<Map> brandList = JSON.parseArray(typeTemplate.getBrandIds(), Map.class);
+            redisTemplate.boundHashOps("brandList").put(typeTemplate.getId(), brandList);
+            //存储规格列表
+            List<Map> specList = findBySpecList(typeTemplate.getId());//根据模板ID查询规格列表
+            redisTemplate.boundHashOps("specList").put(typeTemplate.getId(), specList);
+        }
+    }
+
+    @Override
+    public List<TypeTemplate> findAll() {
+        return typeTemplateDao.selectByExample(null);
     }
 }
