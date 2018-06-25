@@ -19,7 +19,7 @@ app.controller('searchController',function($scope,$location,searchService){
 	//构建分页栏	
 	buildPageLabel=function(){
 		//构建分页栏
-		$scope.pageLabel=[];
+		$scope.pageLabel=[];//新增分页栏属性
 		var firstPage=1;//开始页码
 		var lastPage=$scope.resultMap.totalPages;//截止页码
 		$scope.firstDot=true;//前面有点
@@ -110,7 +110,7 @@ app.controller('searchController',function($scope,$location,searchService){
 	//判断关键字是否是品牌
 	$scope.keywordsIsBrand=function(){		
 		for(var i=0;i< $scope.resultMap.brandList.length;i++){			
-			if( $scope.searchMap.keywords.indexOf( $scope.resultMap.brandList[i].text )>=0  ){
+			if( $scope.searchMap.keywords.indexOf( $scope.resultMap.brandList[i].text )>=0){
 				return true;				
 			}			
 		}

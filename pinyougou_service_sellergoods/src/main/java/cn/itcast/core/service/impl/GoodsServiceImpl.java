@@ -18,13 +18,11 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -144,9 +142,17 @@ public class GoodsServiceImpl implements GoodsService {
         for (Long id : ids) {
             goods.setId(id);
             goodsDao.updateByPrimaryKeySelective(goods);
+            //删除索引库
+            solrTemplate.deleteById(String.valueOf(id));
+            solrTemplate.commit();
         }
     }
 
+    /**
+     *更新状态   审核通过  或驳回
+     * @param ids
+     * @param status
+     */
     @Override
     public void updateStatus(Long[] ids, String status) {
         Goods goods = new Goods();
@@ -154,6 +160,23 @@ public class GoodsServiceImpl implements GoodsService {
         for (Long id:ids) {
             goods.setId(id);
             goodsDao.updateByPrimaryKeySelective(goods);
+        }
+        //判断是否为审核通过
+        if ("1".equals(status)){
+            importList(ids);
+        }
+
+    }
+    @Autowired
+    private SolrTemplate solrTemplate;
+    //导入审核通过的商品  根据商品ids
+    private void importList(Long[] ids) {
+        ItemQuery query = new ItemQuery();
+        query.createCriteria().andStatusEqualTo("1").andGoodsIdIn(Arrays.asList(ids));
+        List<Item> itemList = itemDao.selectByExample(query);
+        if (itemList.size()>0){
+        //导入索引库
+        solrTemplate.saveBeans(itemList,1000);
         }
     }
 

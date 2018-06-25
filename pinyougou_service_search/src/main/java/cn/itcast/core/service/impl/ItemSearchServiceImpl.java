@@ -5,6 +5,7 @@ import cn.itcast.core.service.ItemSearchService;
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
@@ -25,6 +26,9 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 
     @Override
     public Map<String, Object> search(Map searchMap) {
+        //关键字空格处理
+        String keywords = (String) searchMap.get("keywords");
+        searchMap.put("keywords",keywords.replace(" ",""));
         Map<String, Object> map = new HashMap();
         //1.按关键字查询（高亮显示）
         map.putAll(searchList(searchMap));
@@ -35,8 +39,6 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         if (categoryList.size() > 0) {
             map.putAll(searchBrandAndSpecList(String.valueOf(categoryList.get(0))));
         }
-
-
         return map;
     }
 
@@ -107,7 +109,19 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         }
         query.setOffset((pageNo-1)*pageSize);//从第几条记录查询
         query.setRows(pageSize);
-
+        //1.7排序
+        String sort = (String) searchMap.get("sort");//ASC DESC
+        String sortField= (String) searchMap.get("sortField");//排序字段
+        if (sort!=null && !sort.equals("")){
+            if (sort.equals("ASC")){
+                Sort orders = new Sort(Sort.Direction.ASC, "item_" + sortField);
+                query.addSort(orders);
+            }
+            if (sort.equals("DESC")){
+                Sort orders = new Sort(Sort.Direction.DESC, "item_" + sortField);
+                query.addSort(orders);
+            }
+        }
         //***********  获取高亮结果集  ***********
         //高亮页对象
         HighlightPage<Item> page = solrTemplate.queryForHighlightPage(query, Item.class);
