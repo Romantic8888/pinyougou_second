@@ -1,6 +1,8 @@
 package cn.itcast.core.service.impl;
 
+import cn.itcast.core.dao.item.ItemDao;
 import cn.itcast.core.pojo.item.Item;
+import cn.itcast.core.pojo.item.ItemQuery;
 import cn.itcast.core.service.ItemSearchService;
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,7 @@ import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.*;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -28,7 +27,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
     public Map<String, Object> search(Map searchMap) {
         //关键字空格处理
         String keywords = (String) searchMap.get("keywords");
-        searchMap.put("keywords",keywords.replace(" ",""));
+        searchMap.put("keywords", keywords.replace(" ", ""));
         Map<String, Object> map = new HashMap();
         //1.按关键字查询（高亮显示）
         map.putAll(searchList(searchMap));
@@ -40,6 +39,16 @@ public class ItemSearchServiceImpl implements ItemSearchService {
             map.putAll(searchBrandAndSpecList(String.valueOf(categoryList.get(0))));
         }
         return map;
+    }
+
+    @Override
+    public List<Item> findItemListByGoodsIdAndStatus(Long id, String status) {
+        ItemQuery itemQuery = new ItemQuery();
+        cn.itcast.core.pojo.item.ItemQuery.Criteria createCriteria = itemQuery.createCriteria();
+        createCriteria.andGoodsIdEqualTo(id);
+        createCriteria.andStatusEqualTo(status);
+        List<Item> list = itemDao.selectByExample(itemQuery);
+        return list;
     }
 
     /**
@@ -85,39 +94,39 @@ public class ItemSearchServiceImpl implements ItemSearchService {
             }
         }
         //1.5按价格筛选.....
-        if(!"".equals(searchMap.get("price"))){
+        if (!"".equals(searchMap.get("price"))) {
             String[] price = ((String) searchMap.get("price")).split("-");
-            if(!price[0].equals("0")){//如果区间起点不等于0
-                Criteria filterCriteria=new Criteria("item_price").greaterThanEqual(price[0]);
-                FilterQuery filterQuery=new SimpleFilterQuery(filterCriteria);
+            if (!price[0].equals("0")) {//如果区间起点不等于0
+                Criteria filterCriteria = new Criteria("item_price").greaterThanEqual(price[0]);
+                FilterQuery filterQuery = new SimpleFilterQuery(filterCriteria);
                 query.addFilterQuery(filterQuery);
             }
-            if(!price[1].equals("*")){//如果区间终点不等于*
-                Criteria filterCriteria=new  Criteria("item_price").lessThanEqual(price[1]);
-                FilterQuery filterQuery=new SimpleFilterQuery(filterCriteria);
+            if (!price[1].equals("*")) {//如果区间终点不等于*
+                Criteria filterCriteria = new Criteria("item_price").lessThanEqual(price[1]);
+                FilterQuery filterQuery = new SimpleFilterQuery(filterCriteria);
                 query.addFilterQuery(filterQuery);
             }
         }
         //1.6 分页查询
-        Integer pageNo= (Integer) searchMap.get("pageNo");//提取页码
-        if(pageNo==null){
-            pageNo=1;//默认第一页
+        Integer pageNo = (Integer) searchMap.get("pageNo");//提取页码
+        if (pageNo == null) {
+            pageNo = 1;//默认第一页
         }
-        Integer pageSize=(Integer) searchMap.get("pageSize");//每页记录数
-        if(pageSize==null){
-            pageSize=20;//默认20
+        Integer pageSize = (Integer) searchMap.get("pageSize");//每页记录数
+        if (pageSize == null) {
+            pageSize = 20;//默认20
         }
-        query.setOffset((pageNo-1)*pageSize);//从第几条记录查询
+        query.setOffset((pageNo - 1) * pageSize);//从第几条记录查询
         query.setRows(pageSize);
         //1.7排序
         String sort = (String) searchMap.get("sort");//ASC DESC
-        String sortField= (String) searchMap.get("sortField");//排序字段
-        if (sort!=null && !sort.equals("")){
-            if (sort.equals("ASC")){
+        String sortField = (String) searchMap.get("sortField");//排序字段
+        if (sort != null && !sort.equals("")) {
+            if (sort.equals("ASC")) {
                 Sort orders = new Sort(Sort.Direction.ASC, "item_" + sortField);
                 query.addSort(orders);
             }
-            if (sort.equals("DESC")){
+            if (sort.equals("DESC")) {
                 Sort orders = new Sort(Sort.Direction.DESC, "item_" + sortField);
                 query.addSort(orders);
             }
@@ -128,7 +137,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         //高亮入口集合(每条记录的高亮入口)
         List<HighlightEntry<Item>> entryList = page.getHighlighted();
 
-        for(HighlightEntry<Item> entry:entryList  ){
+        for (HighlightEntry<Item> entry : entryList) {
             //获取高亮列表(高亮域的个数)
             List<HighlightEntry.Highlight> highlightList = entry.getHighlights();
 			/*
@@ -136,7 +145,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 				List<String> sns = h.getSnipplets();//每个域有可能存储多值
 				System.out.println(sns);
 			}*/
-            if(highlightList.size()>0 &&  highlightList.get(0).getSnipplets().size()>0 ){
+            if (highlightList.size() > 0 && highlightList.get(0).getSnipplets().size() > 0) {
                 Item item = entry.getEntity();
                 item.setTitle(highlightList.get(0).getSnipplets().get(0));
             }
@@ -197,5 +206,26 @@ public class ItemSearchServiceImpl implements ItemSearchService {
             map.put("specList", specList);
         }
         return map;
+    }
+
+    @Autowired
+    private ItemDao itemDao;
+
+    @Override
+    //导入审核通过的商品
+    public void importList(List<Item> itemList) {
+        if (itemList.size() > 0) {
+            //导入索引库
+            solrTemplate.saveBeans(itemList, 1000);
+        }
+    }
+
+    @Override
+    public void deleteByGoodsIds(long goodsId) {
+        Query query = new SimpleQuery();
+        Criteria criteria = new Criteria("item_goodsid").is(goodsId);
+        query.addCriteria(criteria);
+        solrTemplate.delete(query);
+        solrTemplate.commit();
     }
 }

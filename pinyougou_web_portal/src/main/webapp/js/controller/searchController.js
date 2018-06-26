@@ -125,8 +125,7 @@ app.controller('searchController',function($scope,$location,searchService){
 
 	//跳转到静态页面
 	$scope.openDetailPage = function(goodsId){
-		alert(goodsId);
-		window.open("http://localhost:8087/"+goodsId+".html");
+		//alert(goodsId);
+		window.open("http://localhost:9103/"+goodsId+".html");
 	}
-	
 });
