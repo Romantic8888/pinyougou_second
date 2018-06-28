@@ -18,14 +18,16 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.*;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -160,8 +162,6 @@ public class GoodsServiceImpl implements GoodsService {
                         return textMessage;
                     }
                 });
-                //solrTemplate.deleteById(String.valueOf(id));
-                //solrTemplate.commit();
             }
         }
     }
@@ -202,8 +202,6 @@ public class GoodsServiceImpl implements GoodsService {
         }
     }
 
-    @Autowired
-    private SolrTemplate solrTemplate;
 
     private void checkIsEnableSpec(GoodsVo vo) {
         //判断是否启用规格
